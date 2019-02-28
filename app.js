@@ -5,10 +5,10 @@ const express           = require('express')
 
 const { buildSchema }   = require('graphql')
 
+const Event             = require('./models/event')
+const User              = require('./models/user')
+
 const app               = express()
-
-
-const events = []
 
 
 app.use(bodyParser.json())
@@ -21,17 +21,27 @@ app.use('/graphql', graphqlHttp({
             price: Float!
             date: String!
         }
+        type User {
+            _id: ID!
+            email: String!
+            password: String
+        }
         input EventInput {
             title: String!
             description: String!
             price: Float!
             date: String!
         }
+        input UserInput {
+            email: String!
+            password: String!
+        }
         type RootQuery {
             events: [Event!]!
         }
         type RootMutation {
             createEvent(eventInput: EventInput): Event
+            createUser(userInput: UserInput): User
         }
         schema {
             query: RootQuery
@@ -40,18 +50,40 @@ app.use('/graphql', graphqlHttp({
     `),
     rootValue: {
         events: () => {
-            return events
+            return Event
+                .find()
+                .then(events => {
+                    return events.map(event => {
+                        return { ...event._doc, _id: event.id }
+                    })
+                })
+                .catch(err => {
+                    throw err
+                })
         },
-        createEvent: (args) => {
-            const event = {
-                _id: Math.random().toString(),
+        createEvent: args => {
+            const event = new Event({
                 title: args.eventInput.title,
                 description: args.eventInput.description,
                 price: +args.eventInput.price,
-                date: args.eventInput.date,
-            }
-            events.push(event)
+                date: new Date(args.eventInput.date),
+            })
             return event
+            .save()
+            .then(result => {
+                console.log(result)
+                return { ...result._doc, _id: event._doc._id.toString() }
+            })
+            .catch(err => {
+                console.log(err)
+                throw err;
+            })
+        },
+        createUser: args => {
+            const user = new User({
+                email: args.userInput.email,
+                password: args.userInput.password,
+            })
         },
     },
     graphiql: true,
@@ -59,7 +91,7 @@ app.use('/graphql', graphqlHttp({
 
 
 mongoose.connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-kng3h.mongodb.net/test?retryWrites=true`
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-kng3h.mongodb.net/${process.env.MONGO_DB}?retryWrites=true`
 ).then(() => {
     app.listen(3000, () => { console.log('up on 3000') })
 }).catch(err => {
