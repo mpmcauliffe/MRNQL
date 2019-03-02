@@ -2,11 +2,12 @@ const express           = require('express')
       bodyParser        = require('body-parser')
       graphqlHttp       = require('express-graphql') 
       mongoose          = require('mongoose')
+      bcrypt            = require('bcryptjs')
 
 const { buildSchema }   = require('graphql')
 
 const Event             = require('./models/event')
-const User              = require('./models/user')
+      User              = require('./models/user')
 
 const app               = express()
 
@@ -49,51 +50,67 @@ app.use('/graphql', graphqlHttp({
         }
     `),
     rootValue: {
-        events: () => {
-            return Event
-                .find()
-                .then(events => {
-                    return events.map(event => {
-                        return { ...event._doc, _id: event.id }
-                    })
-                })
-                .catch(err => {
-                    throw err
-                })
-        },
-        createEvent: args => {
-            const event = new Event({
-                title: args.eventInput.title,
-                description: args.eventInput.description,
-                price: +args.eventInput.price,
-                date: new Date(args.eventInput.date),
+    events: () => {
+        return Event.find()
+            .then(events => {
+                return events.map(event => {
+                    return { ...event._doc, _id: event.id } 
+                }) 
             })
-            return event
+            .catch(err => { throw err }) 
+    },
+        createEvent: args => {
+        const event = new Event({
+            title: args.eventInput.title,
+            description: args.eventInput.description,
+            price: +args.eventInput.price,
+            date: new Date(args.eventInput.date),
+            creator: '5c79d00e67706c5f9c4ae772'
+        }) 
+        let createdEvent 
+        return event
             .save()
             .then(result => {
-                console.log(result)
-                return { ...result._doc, _id: event._doc._id.toString() }
+                return User.findById('5c79d00e67706c5f9c4ae772') 
+                createdEvent = { ...result._doc, _id: result._doc._id.toString() } 
             })
+            .then(user => {
+                if (!user) { throw new Error('User not found.') }
+
+                user.createdEvents.push(event) 
+                return user.save() 
+            })
+            .then(result => { return createdEvent })
             .catch(err => {
-                console.log(err)
-                throw err;
-            })
+                console.log(err) 
+                throw err 
+            }) 
         },
+
         createUser: args => {
-            const user = new User({
-                email: args.userInput.email,
-                password: args.userInput.password,
-            })
-        },
+            return User.findOne({ email: args.userInput.email })
+                .then(user => {
+                    if (user) { throw new Error('User exists already.') }
+                    return bcrypt.hash(args.userInput.password, 12) 
+                })
+                .then(hashedPassword => {
+                    const user = new User({
+                        email: args.userInput.email,
+                        password: hashedPassword,
+                    }) 
+                    return user.save() 
+                })
+                .then(result => {
+                    return { ...result._doc, password: null, _id: result.id } 
+                })
+                .catch(err => { throw err }) 
+        }
     },
     graphiql: true,
-}))
+})) 
 
 
-mongoose.connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-kng3h.mongodb.net/${process.env.MONGO_DB}?retryWrites=true`
-).then(() => {
-    app.listen(3000, () => { console.log('up on 3000') })
-}).catch(err => {
-    console.log(err)
-})
+mongoose
+    .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-kng3h.mongodb.net/${process.env.MONGO_DB}?retryWrites=true`)
+    .then(() => { app.listen(3000, () => console.log('up on 3000. . .')) })
+    .catch(err => { console.log(err) }) 
