@@ -2,7 +2,7 @@ const bcrypt            = require('bcryptjs')
       jwt               = require('jsonwebtoken')
       User              = require('../../models/user')
 
-const { userKey, }      = require('../../config/userKey')
+      userKey           = require('../../config/userKey.json')
 
 
 module.exports = {
@@ -31,7 +31,7 @@ module.exports = {
                 userId: user.id, 
                 email: user.email 
             }, 
-            userKey,
+            userKey['JWT_SECRET'],
             {
                 expiresIn: '1h'
             }
