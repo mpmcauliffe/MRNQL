@@ -6,10 +6,14 @@ const express           = require('express')
       graphqlSchema     = require('./graphql/schema/index')
       graphqlResolvers  = require('./graphql/resolvers/index')  
 
+      isAuth            = require('./middleware/is-auth')
+
 
 const app = express()
 app.use(bodyParser.json())
 
+
+app.use(isAuth)
 
 app.use('/graphql', graphqlHttp({
     schema: graphqlSchema,

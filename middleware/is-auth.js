@@ -1,8 +1,8 @@
 const jwt               = require('jsonwebtoken')
-      userKey           = require('../../config/userKey.json')
+      userKey           = require('../config/userKey.json')
 
 
-mondule.exports = (req, res, next) => {
+module.exports = (req, res, next) => {
     const authHeader = req.get('Authorization')
     if(!authHeader) { 
         req.isAuth = false
@@ -14,6 +14,21 @@ mondule.exports = (req, res, next) => {
         req.isAuth = false
         return next()
     }
+    
+    let decodedToken
+    try {
+        decodedToken = jwt.verify(token, userKey['JWT_SECRET'])
+    } catch (err) {
+        req.isAuth = false
+        return next()
+    }
 
-    jwt.verify(token, userkey['JWT_SECRET'])
+    if(!decodedToken) {
+        req.isAuth = false
+        return next()
+    }
+
+    req.isAuth = true
+    req.userId = decodedToken.userId
+    next()
 }
