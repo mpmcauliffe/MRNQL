@@ -1,13 +1,25 @@
 import React, { Component } from 'react'
+import { 
+    BrowserRouter, 
+    Redirect, 
+    Route, 
+    Switch,
+} from 'react-router-dom' 
+import AuthPage from './pages/Auth'
 import './App.css'
 
 
 class App extends Component {
     render() {
         return (
-            <div className='app'>
-                <h1>In geosynchronous orbit with React!</h1>
-            </div>
+            <BrowserRouter>
+                <Switch>
+                    <Redirect from='/' to='/auth' exact />
+                    <Route path='/auth' component={AuthPage} />
+                    <Route path='/events' component={null} />
+                    <Route path='/bookings' component={null} />
+                </Switch>
+            </BrowserRouter>
         )
     }
 }
