@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "3b5039f6-bf02-4d2a-8ffd-91af413186c2",
+		"name": "MERNQL",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"query { login(email:\\\"superbear@cub.com\\\", password: \\\"asdf\\\") { token } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				},
+				"description": "using .json to create a graphql query string to test login POST RTE"
+			},
+			"response": []
+		},
+		{
+			"name": "createEvent / AUTH",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1YzdmMDFjMTBlZGE4NTM3YjgzMjkzYjUiLCJlbWFpbCI6InN1cGVyYmVhckBjdWIuY29tIiwiaWF0IjoxNTUxODMxMDgyLCJleHAiOjE1NTE4MzQ2ODJ9.tbqZHtwGowCDhxCwOPQTWHTzXzqe1J5NNp0Y9bL9w2k"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"query\": \"mutation { createEvent(eventInput: {title: \\\"should work\\\", description: \\\"should work\\\", price: 40.00, date: \\\"2019-03-06T00:18:13.356Z\\\"}) { _id title } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/graphql",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
