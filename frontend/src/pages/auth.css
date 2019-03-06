@@ -11,9 +11,9 @@
     margin-bottom: 0.5rem;
 }
 .form-control input {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     height: 1.7rem;
-    padding-left: 5px;
+    padding: 2px 5px;
     border: 1px solid #01d1d1;
     border-radius: 3px;
     transition: 400ms;
