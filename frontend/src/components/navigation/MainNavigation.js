@@ -1,13 +1,14 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import './mainNavigation.css'
 
 
 const MainNavigation = props => 
-    <header>
+    <header className='main-navigation'>
         <div className='main-navigation__logo'>
-            <h4>Navbar</h4>
+            <h3>EasyEvent</h3>
         </div>
-        <nav className='main-navigation__item'>
+        <nav className='main-navigation__items'>
             <ul>
                 <li>
                     <NavLink to='/Auth'>Authenticate</NavLink>

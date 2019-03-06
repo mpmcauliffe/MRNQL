@@ -24,5 +24,5 @@ app.use('/graphql', graphqlHttp({
 
 mongoose
     .connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-kng3h.mongodb.net/${process.env.MONGO_DB}?retryWrites=true`)
-    .then(() => { app.listen(3000, () => console.log('up on 3000. . .')) })
+    .then(() => { app.listen(3001, () => console.log('up on 3001. . .')) })
     .catch(err => { console.log(err) }) 
