@@ -34,7 +34,7 @@ class EventsPage extends Component {
 
         if(
             title.trim().length === 0 || 
-            price.trim().length === 0 || 
+            price <= 0 || 
             date.trim().length === 0 || 
             description.trim().length === 0
         ) { return }
@@ -45,7 +45,7 @@ class EventsPage extends Component {
         const requestBody = {
             query: `
                 mutation {
-                    createEvent(eventInput: {title: "${title}", description: "${description}", price: ${price}, date: "${date}") {
+                    createEvent(eventInput: {title: "${title}", description: "${description}", price: ${price}, date: "${date}"}) {
                         _id
                         title
                         description
