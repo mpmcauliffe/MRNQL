@@ -1,5 +1,6 @@
 import React, { Component, Fragment, } from 'react'
 import AuthContext from '../context/auth-context'
+import { EventList } from '../components/events'
 import Modal from '../components/modal/Modal'
 import Backdrop from '../components/backdrop/backdrop'
 import './events.css'
@@ -23,6 +24,7 @@ class EventsPage extends Component {
     componentDidMount() {
         this.fetchEvents()
     }
+
 
     handleModalToggle = () => {
         this.setState(prevState => {
@@ -123,10 +125,6 @@ class EventsPage extends Component {
 
 
     render() {
-        const eventList = this.state.events.map(event => {
-            return <li key={event._id} className='events__list-item'>{event.title}</li>
-        })
-
         return (
             <Fragment>
                 {this.state.isOpen &&
@@ -160,17 +158,19 @@ class EventsPage extends Component {
                         </Modal>
                     </Fragment>
                 }
+
                 {this.context.token && 
                     <div className='events-control'>
                         <p>Share your own Events!</p>
                         <button className='btn' onClick={this.handleModalToggle}>Create Event</button>
                     </div>
                 }
-                <ul className='events__list'>
-                    {eventList}
-                </ul>
-            </Fragment>
 
+                <EventList 
+                    events={this.state.events} 
+                    authUserId={this.context.userId} 
+                />
+            </Fragment>
         )
     }
 }
