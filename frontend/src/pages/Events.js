@@ -8,6 +8,7 @@ import './events.css'
 class EventsPage extends Component {
     state = {
         isOpen: false,
+        events: [],
     }
     constructor(props) {
         super(props)
@@ -18,6 +19,10 @@ class EventsPage extends Component {
     }
     static contextType = AuthContext
 
+
+    componentDidMount() {
+        this.fetchEvents()
+    }
 
     handleModalToggle = () => {
         this.setState(prevState => {
@@ -39,9 +44,9 @@ class EventsPage extends Component {
             description.trim().length === 0
         ) { return }
 
-        const event = { title, price, date, description }
+        //const event = { title, price, date, description }
+        //console.log(event)
 
-        console.log(event)
         const requestBody = {
             query: `
                 mutation {
@@ -74,14 +79,54 @@ class EventsPage extends Component {
 
             return res.json()
         }).then(resData => {
-            console.log(resData)
+            this.fetchEvents()
         }).catch(err => { console.log(err) })
         
         this.handleModalToggle()
     }
+    fetchEvents = () => {
+        const requestBody = {
+            query: `
+                query {
+                    events {
+                        _id
+                        title
+                        description
+                        date
+                        price
+                        creator {
+                            _id
+                            email
+                        }
+                    }
+                }`
+        }
+
+
+        fetch('http://localhost:3001/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            if(res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed')
+            }
+
+            return res.json()
+        }).then(resData => {
+            const events = resData.data.events
+            this.setState({ events: events })
+        }).catch(err => { console.log(err) })
+    }
 
 
     render() {
+        const eventList = this.state.events.map(event => {
+            return <li key={event._id} className='events__list-item'>{event.title}</li>
+        })
+
         return (
             <Fragment>
                 {this.state.isOpen &&
@@ -115,10 +160,15 @@ class EventsPage extends Component {
                         </Modal>
                     </Fragment>
                 }
-                <div className='events-control'>
-                    <p>Share your own Events!</p>
-                    <button className='btn' onClick={this.handleModalToggle}>Create Event</button>
-                </div>
+                {this.context.token && 
+                    <div className='events-control'>
+                        <p>Share your own Events!</p>
+                        <button className='btn' onClick={this.handleModalToggle}>Create Event</button>
+                    </div>
+                }
+                <ul className='events__list'>
+                    {eventList}
+                </ul>
             </Fragment>
 
         )
