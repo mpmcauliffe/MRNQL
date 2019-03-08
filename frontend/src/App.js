@@ -9,7 +9,7 @@ import AuthContext from './context/auth-context'
 import AuthPage from './pages/Auth'
 import BookingsPage from './pages/Bookings'
 import EventsPage from './pages/Events'
-import { MainNavigation, } from './components/navigation/MainNavigation'
+import MainNavigation  from './components/navigation/MainNavigation'
 import './App.css'
 
 
