@@ -3,6 +3,7 @@ import AuthContext from '../context/auth-context'
 import { EventList } from '../components/events'
 import Modal from '../components/modal/Modal'
 import Backdrop from '../components/backdrop/backdrop'
+import Spinner from '../components/spinner/Spinner'
 import './events.css'
 
 
@@ -10,6 +11,7 @@ class EventsPage extends Component {
     state = {
         isOpen: false,
         events: [],
+        isLoading: false,
     }
     constructor(props) {
         super(props)
@@ -33,6 +35,8 @@ class EventsPage extends Component {
             }
         })
     }
+
+
     handleConfirm = () => {
         const title      = this.titleElement.current.value
         const price      = +this.priceElement.current.value
@@ -58,10 +62,6 @@ class EventsPage extends Component {
                         description
                         date
                         price
-                        creator {
-                            _id
-                            email
-                        }
                     }
                 }`
         }
@@ -81,12 +81,30 @@ class EventsPage extends Component {
 
             return res.json()
         }).then(resData => {
-            this.fetchEvents()
+            this.setState(prevState => {
+                const updatedEvents = [...prevState.events]
+                updatedEvents.push({
+                    _id: resData.data.createEvent._id,
+                    title: resData.data.createEvent.title,
+                    description: resData.data.createEvent.description, 
+                    date: resData.data.createEvent.date,
+                    price: resData.data.createEvent.price,
+                    creator: {
+                        _id: this.context.userId,
+                    },
+                })
+
+                return { events: updatedEvents }
+            })
         }).catch(err => { console.log(err) })
         
         this.handleModalToggle()
     }
+
+
     fetchEvents = () => {
+        this.setState({ isLoading: true })
+
         const requestBody = {
             query: `
                 query {
@@ -104,7 +122,6 @@ class EventsPage extends Component {
                 }`
         }
 
-
         fetch('http://localhost:3001/graphql', {
             method: 'POST',
             body: JSON.stringify(requestBody),
@@ -119,8 +136,11 @@ class EventsPage extends Component {
             return res.json()
         }).then(resData => {
             const events = resData.data.events
-            this.setState({ events: events })
-        }).catch(err => { console.log(err) })
+            this.setState({ events: events, isLoading: false })
+        }).catch(err => { 
+            console.log(err) 
+            this.setState({ isLoading: false })
+        })
     }
 
 
@@ -166,10 +186,16 @@ class EventsPage extends Component {
                     </div>
                 }
 
-                <EventList 
-                    events={this.state.events} 
-                    authUserId={this.context.userId} 
-                />
+                {this.state.isLoading 
+                    ?   (
+                        <Spinner />
+                    ) : (
+                        <EventList 
+                            events={this.state.events} 
+                            authUserId={this.context.userId}
+                        />
+                    )   
+                }
             </Fragment>
         )
     }
