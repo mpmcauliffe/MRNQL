@@ -1,4 +1,5 @@
-import React, { Component, createRef, Fragment, } from 'react'
+import React, { Component, Fragment, } from 'react'
+import AuthContext from '../context/auth-context'
 import Modal from '../components/modal/Modal'
 import Backdrop from '../components/backdrop/backdrop'
 import './events.css'
@@ -10,11 +11,13 @@ class EventsPage extends Component {
     }
     constructor(props) {
         super(props)
-        this.titleElement = createRef()
-        this.priceElement = createRef()
-        this.dateElement = createRef()
-        this.descriptionElement = createRef()
+        this.titleElement       = React.createRef()
+        this.priceElement       = React.createRef()
+        this.dateElement        = React.createRef()
+        this.descriptionElement = React.createRef()
     }
+    static contextType = AuthContext
+
 
     handleModalToggle = () => {
         this.setState(prevState => {
@@ -24,13 +27,56 @@ class EventsPage extends Component {
         })
     }
     handleConfirm = () => {
-        const title = this.titleElement,
-              price = this.priceElement,
-               date = this.dateElement,
-         desciption = this.descriptionElement;
+        const title      = this.titleElement.current.value
+        const price      = +this.priceElement.current.value
+        const date       = this.dateElement.current.value
+        const description = this.descriptionElement.current.value
 
+        if(
+            title.trim().length === 0 || 
+            price.trim().length === 0 || 
+            date.trim().length === 0 || 
+            description.trim().length === 0
+        ) { return }
+
+        const event = { title, price, date, description }
+
+        console.log(event)
+        const requestBody = {
+            query: `
+                mutation {
+                    createEvent(eventInput: {title: "${title}", description: "${description}", price: ${price}, date: "${date}") {
+                        _id
+                        title
+                        description
+                        date
+                        price
+                        creator {
+                            _id
+                            email
+                        }
+                    }
+                }`
+        }
+        const token = this.context.token
+
+        fetch('http://localhost:3001/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => {
+            if(res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed')
+            }
+
+            return res.json()
+        }).then(resData => {
+            console.log(resData)
+        }).catch(err => { console.log(err) })
         
-
         this.handleModalToggle()
     }
 
@@ -51,19 +97,19 @@ class EventsPage extends Component {
                             <form>
                                 <div className='form-control'>
                                     <label htmlFor='title'>title</label>
-                                    <input type='text' id='title' ref={this.titleElement} />
+                                    <input type='text' id='title' ref={this.titleElement}></input>
                                 </div>
                                 <div className='form-control'>
                                     <label htmlFor='price'>price</label>
-                                    <input type='number' id='price' ref={this.priceElement} />
+                                    <input type='number' id='price' ref={this.priceElement}></input>
                                 </div>
                                 <div className='form-control'>
                                     <label htmlFor='date'>date</label>
-                                    <input type='date' id='date' ref={this.dateElement} />
+                                    <input type='datetime-local' id='date' ref={this.dateElement}></input>
                                 </div>
                                 <div className='form-control'>
                                     <label htmlFor='description'>description</label>
-                                    <textarea id='description' rows='4' ref={this.descriptionElement} />
+                                    <textarea id='description' rows='4' ref={this.descriptionElement}></textarea>
                                 </div>
                             </form>
                         </Modal>
