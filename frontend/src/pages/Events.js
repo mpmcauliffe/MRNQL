@@ -29,15 +29,6 @@ class EventsPage extends Component {
     }
 
 
-    handleModalToggle = () => {
-        this.setState(prevState => {
-            return {
-                isOpen: !prevState.isOpen,
-            }
-        })
-    }
-
-
     handleConfirm = () => {
         const title      = this.titleElement.current.value
         const price      = +this.priceElement.current.value
@@ -145,12 +136,28 @@ class EventsPage extends Component {
     }
 
 
+    handleBookEvent = () => {}
+
+
     handleViewDetails = eventId => {
         this.setState(prevState => {
             const selectedEvent = prevState.events.find(e => e._id === eventId)
 
             return { selectedEvent: selectedEvent }
         })
+    }
+    
+
+    handleModalToggle = () => {
+        if(this.state.selectedEvent) {
+            this.setState({ selectedEvent: null })
+        } else {
+            this.setState(prevState => {
+                return {
+                    isOpen: !prevState.isOpen,
+                }
+            })
+        }
     }
 
 
@@ -165,7 +172,7 @@ class EventsPage extends Component {
                             canCancel 
                             canConfirm
                             handleTurnOff={this.handleModalToggle}
-                            onConfirm={this.handleConfirm}
+                            onConfirm={this.handleBookEvent}
                         >
                             <form>
                                 <div className='form-control'>
@@ -189,34 +196,18 @@ class EventsPage extends Component {
                     </Fragment>
                 }
 
-                {this.selectedEvent &&
+                {this.state.selectedEvent && 
                     <Fragment>
                         <Backdrop handleTurnOff={this.handleModalToggle} />
                         <Modal 
-                            title='Add Event' 
+                            title={this.state.selectedEvent.title} 
                             canCancel 
                             canConfirm
                             handleTurnOff={this.handleModalToggle}
                             onConfirm={this.handleConfirm}
                         >
-                            <form>
-                                <div className='form-control'>
-                                    <label htmlFor='title'>title</label>
-                                    <input type='text' id='title' ref={this.titleElement}></input>
-                                </div>
-                                <div className='form-control'>
-                                    <label htmlFor='price'>price</label>
-                                    <input type='number' id='price' ref={this.priceElement}></input>
-                                </div>
-                                <div className='form-control'>
-                                    <label htmlFor='date'>date</label>
-                                    <input type='datetime-local' id='date' ref={this.dateElement}></input>
-                                </div>
-                                <div className='form-control'>
-                                    <label htmlFor='description'>description</label>
-                                    <textarea id='description' rows='4' ref={this.descriptionElement}></textarea>
-                                </div>
-                            </form>
+                            <h2>${this.state.selectedEvent.price} &#8211; {this.state.selectedEvent.date}</h2>
+                            <p>{this.state.selectedEvent.description}</p>
                         </Modal>
                     </Fragment>
                 }
