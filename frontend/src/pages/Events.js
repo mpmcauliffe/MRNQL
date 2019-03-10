@@ -136,7 +136,39 @@ class EventsPage extends Component {
     }
 
 
-    handleBookEvent = () => {}
+    handleBookEvent = () => {
+        const requestBody = {
+            query: `
+                mutation {
+                    bookEvent(eventId: "${this.state.selectedEvent._id}") {
+                        _id
+                        createdAt
+                        updatedAt
+                    }
+                }`
+        }
+        const token = this.context.token
+
+        fetch('http://localhost:3001/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        }).then(res => {
+            if(res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed')
+            }
+
+            return res.json()
+        }).then(resData => {
+            console.log(resData)
+        }).catch(err => { 
+            console.log(err) 
+            this.setState({ isLoading: false })
+        })
+    }
 
 
     handleViewDetails = eventId => {
@@ -173,6 +205,7 @@ class EventsPage extends Component {
                             canConfirm
                             handleTurnOff={this.handleModalToggle}
                             onConfirm={this.handleBookEvent}
+                            confirmText='Confirm'
                         >
                             <form>
                                 <div className='form-control'>
@@ -205,6 +238,7 @@ class EventsPage extends Component {
                             canConfirm
                             handleTurnOff={this.handleModalToggle}
                             onConfirm={this.handleConfirm}
+                            confirmText='Book'
                         >
                             <h2>${this.state.selectedEvent.price} &#8211; {this.state.selectedEvent.date}</h2>
                             <p>{this.state.selectedEvent.description}</p>

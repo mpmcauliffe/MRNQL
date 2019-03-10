@@ -1,70 +1,31 @@
+
 .spinner {
     display: flex;
     justify-content: center;
     align-items: center;
 }
-
-.lds-default {
+.lds-dual-ring {
     display: inline-block;
-    position: relative;
     width: 64px;
     height: 64px;
-  }
-  .lds-default div {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    background: #5101d1;
+}
+.lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 46px;
+    height: 46px;
+    margin: 1px;
     border-radius: 50%;
-    animation: lds-default 1.2s linear infinite;
+    border: 5px solid #5101d1;
+    border-color: #5101d1 transparent #5101d1 transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
   }
-  .lds-default div:nth-child(1) {
-    animation-delay: 0s;
-    top: 29px;
-    left: 53px;
-  }
-  .lds-default div:nth-child(2) {
-    animation-delay: -0.1s;
-    top: 18px;
-    left: 50px;
-  }
-  .lds-default div:nth-child(3) {
-    animation-delay: -0.2s;
-    top: 9px;
-    left: 41px;
-  }
-  .lds-default div:nth-child(4) {
-    animation-delay: -0.3s;
-    top: 6px;
-    left: 29px;
-  }
-  .lds-default div:nth-child(5) {
-    animation-delay: -0.4s;
-    top: 9px;
-    left: 18px;
-  }
-  .lds-default div:nth-child(6) {
-    animation-delay: -0.5s;
-    top: 18px;
-    left: 9px;
-  }
-  .lds-default div:nth-child(7) {
-    animation-delay: -0.6s;
-    top: 29px;
-    left: 6px;
-  }
-  .lds-default div:nth-child(8) {
-    animation-delay: -0.7s;
-    top: 41px;
-    left: 9px;
-  }
-  .lds-default div:nth-child(9) {
-    animation-delay: -0.8s;
-    top: 50px;
-    left: 18px;
-  }
-  .lds-default div:nth-child(10) {
-    animation-delay: -0.9s;
-    top: 53px;
-    left: 29px;
-  }
+  
