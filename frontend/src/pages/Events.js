@@ -22,14 +22,20 @@ class EventsPage extends Component {
         this.descriptionElement = React.createRef()
     }
     static contextType = AuthContext
+    isActive = true
 
 
     componentDidMount() {
         this.fetchEvents()
     }
+    componentWillUnmount() {
+        this.isActive = false
+    }
 
 
     handleConfirm = () => {
+        if(!this.context.token) { return }
+
         const title      = this.titleElement.current.value
         const price      = +this.priceElement.current.value
         const date       = this.dateElement.current.value
@@ -128,15 +134,24 @@ class EventsPage extends Component {
             return res.json()
         }).then(resData => {
             const events = resData.data.events
-            this.setState({ events: events, isLoading: false })
+            if(this.isActive) {
+                this.setState({ events: events, isLoading: false })
+            }
         }).catch(err => { 
             console.log(err) 
-            this.setState({ isLoading: false })
+            if(this.isActive) {
+                this.setState({ isLoading: false })
+            }
         })
     }
 
 
     handleBookEvent = () => {
+        if(!this.context.token) { 
+            this.setState({ selectedEvent: null })
+            return 
+        }
+
         const requestBody = {
             query: `
                 mutation {
@@ -147,14 +162,13 @@ class EventsPage extends Component {
                     }
                 }`
         }
-        const token = this.context.token
 
         fetch('http://localhost:3001/graphql', {
             method: 'POST',
             body: JSON.stringify(requestBody),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
+                'Authorization': 'Bearer ' + this.context.token
             }
         }).then(res => {
             if(res.status !== 200 && res.status !== 201) {
@@ -164,9 +178,9 @@ class EventsPage extends Component {
             return res.json()
         }).then(resData => {
             console.log(resData)
+            this.setState({ selectedEvent: null })
         }).catch(err => { 
             console.log(err) 
-            this.setState({ isLoading: false })
         })
     }
 
@@ -237,8 +251,8 @@ class EventsPage extends Component {
                             canCancel 
                             canConfirm
                             handleTurnOff={this.handleModalToggle}
-                            onConfirm={this.handleConfirm}
-                            confirmText='Book'
+                            onConfirm={this.handleBookEvent}
+                            confirmText={this.context.token ? 'Book' : 'Confirm'}
                         >
                             <h2>${this.state.selectedEvent.price} &#8211; {this.state.selectedEvent.date}</h2>
                             <p>{this.state.selectedEvent.description}</p>
