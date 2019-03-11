@@ -1,5 +1,6 @@
 import React, { Component, Fragment, } from 'react'
 import AuthContext from '../context/auth-context'
+import BookingList from '../components/bookings/BookingList'
 import Spinner from '../components/spinner/Spinner'
 
 
@@ -55,6 +56,40 @@ class BookingsPage extends Component {
             this.setState({ isLoading: false })
         })
     }
+    handleBookingDelete = bookingId => {
+        this.setState({ isLoading: true })
+
+        const requestBody = {
+            query: `
+                mutation {
+                    cancelBookings(bookingId: "${bookingId}") {
+                        _id
+                        title
+                    }
+                }`
+        }
+
+        fetch('http://localhost:3001/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + this.context.token
+            }
+        }).then(res => {
+            if(res.status !== 200 && res.status !== 201) {
+                throw new Error('Failed')
+            }
+
+            return res.json()
+        }).then(resData => {
+            const bookings = resData.data.bookings
+            this.setState({ bookings: bookings, isLoading: false })
+        }).catch(err => { 
+            console.log(err) 
+            this.setState({ isLoading: false })
+        })
+    }
 
 
     render() {
@@ -63,15 +98,7 @@ class BookingsPage extends Component {
                 {this.state.isLoading ? ( 
                     <Spinner /> 
                 ) : (
-                    <ul>
-                        {this.state.bookings.map(booking => 
-                            <li key={booking._id}>
-                                {booking.event.title} 
-                                &#8211; 
-                                {new Date(booking.createdAt).toLocaleDateString()}
-                            </li>
-                        )}
-                    </ul>
+                    <BookingList bookings={this.state.bookings} onDelete={this.handleBookingDelete} />
                 )}
             </Fragment>
                 

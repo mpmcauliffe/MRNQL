@@ -4,12 +4,12 @@
     align-items: center;
     margin: 1rem 0;
     padding: 1rem;
-    border: 1px solid #5101d1;
+    border: 1px solid #001e46;
 }
 .events__list-item h1 {
     margin: 0;
     font-size: 1.5rem;
-    color: #5101d1;
+    color: #001e46;
 }
 .events__list-item h2 {
     margin: 0;

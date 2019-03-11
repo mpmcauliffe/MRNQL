@@ -3,3 +3,12 @@
     max-width: 80%;
     margin: 5rem auto;
 }
+
+.auth-form h1 {
+    font-size: 27px;
+    color: #5101d1;
+}
+
+.auth-form label {
+    color: #001e46;
+}

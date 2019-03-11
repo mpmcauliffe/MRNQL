@@ -81,6 +81,7 @@ class AuthPage extends Component {
     render() {
         return (
             <form className='auth-form' onSubmit={this.submitHandler}>
+                <h1>{this.state.isLogin ? 'Login' : 'Signup'}</h1>
                 <div className='form-control'>
                     <label htmlFor='email'>email</label>
                     <input type='email' id='email' ref={this.emailElement} />
