@@ -62,7 +62,7 @@ class BookingsPage extends Component {
         const requestBody = {
             query: `
                 mutation {
-                    cancelBookings(bookingId: "${bookingId}") {
+                    cancelBooking(bookingId: "${bookingId}") {
                         _id
                         title
                     }
@@ -83,8 +83,13 @@ class BookingsPage extends Component {
 
             return res.json()
         }).then(resData => {
-            const bookings = resData.data.bookings
-            this.setState({ bookings: bookings, isLoading: false })
+            this.setState(prevState => {
+                const updateBookings = prevState.bookings.filter(booking => {
+                    return booking._id !== bookingId
+                })
+
+                return { bookings: updateBookings, isLoading: false }
+            })
         }).catch(err => { 
             console.log(err) 
             this.setState({ isLoading: false })
