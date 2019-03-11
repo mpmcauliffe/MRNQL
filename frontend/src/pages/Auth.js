@@ -14,6 +14,8 @@ class AuthPage extends Component {
         this.emailElement = React.createRef()
         this.passwordElement = React.createRef()
     }
+
+    
     submitHandler = e => {
         e.preventDefault()
         const email = this.emailElement.current.value
